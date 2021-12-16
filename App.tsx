@@ -32,7 +32,7 @@ export default function App() {
           <Text>1</Text>
         </Draggable>
         <Draggable xPosition={20} yPosition={20} layout={layout}>
-          <Text>1</Text>
+          <Text>2</Text>
         </Draggable>
       </View>
       <View>
