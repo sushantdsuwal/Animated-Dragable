@@ -1,6 +1,5 @@
-import 'react-native-gesture-handler';
-import React, { useCallback, useState } from 'react';
-import { Dimensions, StyleSheet, View, Text, LayoutChangeEvent } from 'react-native';
+import React, { useState, useCallback, useRef } from 'react';
+import { LayoutChangeEvent, StyleSheet, Text } from 'react-native';
 import Animated, {
   useAnimatedGestureHandler,
   useAnimatedStyle,
@@ -19,7 +18,6 @@ type ContextType = {
 };
 
 interface DraggableProps {
-  children: React.ReactElement;
   xPosition: number;
   yPosition: number;
   layout: {
@@ -30,12 +28,24 @@ interface DraggableProps {
   };
 }
 
-export default function Draggable({ children, xPosition = 0, yPosition = 0, layout }: DraggableProps) {
+export default function Draggable({ xPosition = 0, yPosition = 0, layout }: DraggableProps) {
+  let isDragActive = false;
+  const [elementPosition, setElementPosition] = useState({
+    x: 0,
+    y: 0,
+  });
   const translateX = useSharedValue(xPosition);
   const translateY = useSharedValue(yPosition);
 
+  React.useEffect(() => {
+    console.log('isDragActive', isDragActive);
+  }, [translateX.value, translateY.value]);
+
   const panGestureEvent = useAnimatedGestureHandler<PanGestureHandlerGestureEvent, ContextType>({
     onStart: (_event, context) => {
+      isDragActive = true;
+
+      console.log('context', context.translateX);
       context.translateX = translateX.value;
       context.translateY = translateY.value;
     },
@@ -58,8 +68,8 @@ export default function Draggable({ children, xPosition = 0, yPosition = 0, layo
       ) {
         //  do nothing
       } else {
-        translateX.value = withSpring(xPosition);
-        translateY.value = withSpring(yPosition);
+        // translateX.value = withSpring(xPosition);
+        // translateY.value = withSpring(yPosition);
       }
     },
   });
@@ -77,16 +87,26 @@ export default function Draggable({ children, xPosition = 0, yPosition = 0, layo
     };
   });
 
+  const find_dimensions = useCallback(
+    (event: LayoutChangeEvent | any) => {
+      const { pageX, pageY } = event.target.measure;
+      setElementPosition({ x: pageX, y: pageY });
+    },
+    [isDragActive]
+  );
+
   return (
     <PanGestureHandler onGestureEvent={panGestureEvent}>
-      <Animated.View style={[styles.square, rStyle]}>{children}</Animated.View>
+      <Animated.View style={[styles.square, rStyle]} onLayout={find_dimensions}>
+        <Text>{translateX.value}</Text>
+        <Text>{translateY.value}</Text>
+      </Animated.View>
     </PanGestureHandler>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    margin: 50,
     height: 700,
     width: 500,
     backgroundColor: '#fff',

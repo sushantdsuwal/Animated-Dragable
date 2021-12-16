@@ -28,12 +28,8 @@ export default function App() {
   return (
     <View style={styles.mainContainer}>
       <View onLayout={find_dimensions} style={styles.container}>
-        <Draggable xPosition={10} yPosition={10} layout={layout}>
-          <Text>1</Text>
-        </Draggable>
-        <Draggable xPosition={20} yPosition={20} layout={layout}>
-          <Text>2</Text>
-        </Draggable>
+        <Draggable xPosition={10} yPosition={10} layout={layout} />
+        <Draggable xPosition={50} yPosition={50} layout={layout} />
       </View>
       <View>
         <Text>height:{layout.height}</Text>
